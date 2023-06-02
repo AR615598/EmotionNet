@@ -1,0 +1,2 @@
+from transformers import ViTFeatureExtractor, ViTForImageClassification
+import torch
