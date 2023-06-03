@@ -123,9 +123,7 @@ class Tracker:
         # the center of the subject 
         cv2.circle(frame, (self.centroids[0], self.centroids[1]), 1, (0, 0, 255), 2)
 
-        # circle bounding the subject
-        # cv2.circle(frame, (centroids[1], centroids[0]), avg_radius, (0, 0, 255), 2)
-        # centroids = [x, y], avg_radius = [x,y]
+  
         top_left = (self.centroids[0] - self.avg_radius[0], self.centroids[1] + self.avg_radius[1])
         bottom_right = (self.centroids[0] + self.avg_radius[0], self.centroids[1] -self.avg_radius[1])
         # rectangle bounding the subject

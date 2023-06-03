@@ -35,7 +35,6 @@ class contour_tracker:
             self.centroids, self.avg_radius = self.get_bounds(frame, sorted_contours, n)
 
             # self.draw_n_contours(n, sorted_contours, frame)
-            # avg_radius, avg_offset = self.get_avg_radius(frame, center, sorted_contours)
 
         # Show the image
         # cv2.imshow("Threshold Image", threshold_image)
@@ -65,8 +64,6 @@ class contour_tracker:
         def get_avg_radius(self, center, contour):
             # list is in shape [[[x,y]],[[x,y]],[[x,y]]]
             contours_array = np.squeeze(contour)
-            # distances = np.sqrt(np.sum((contours_array - center) ** 2, axis=1))
-            # avg_radius = np.mean(distances)
             avg_offset = np.mean(np.sqrt((contours_array - center)**2), axis=0)
             return avg_offset.tolist()
         
