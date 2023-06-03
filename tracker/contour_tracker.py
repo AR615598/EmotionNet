@@ -11,7 +11,6 @@ class contour_tracker:
           
           
     
-    
     def mask_shape(self, frame):
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if self.prev_frame is None:
@@ -33,15 +32,16 @@ class contour_tracker:
                 n =5 
             else:
                 n = length
-            self.centroids = self.get_center(frame, sorted_contours, n)
-            self.draw_n_contours(n, sorted_contours, frame)
+            self.centroids, self.avg_radius = self.get_bounds(frame, sorted_contours, n)
+
+            # self.draw_n_contours(n, sorted_contours, frame)
             # avg_radius, avg_offset = self.get_avg_radius(frame, center, sorted_contours)
 
         # Show the image
-        cv2.imshow("Threshold Image", threshold_image)
+        # cv2.imshow("Threshold Image", threshold_image)
         self.prev_frame = gray_frame
 
-        return self.centroids, 100
+        return self.centroids, self.avg_radius
     
 
     def draw_n_contours(self, n, contours, frame):
@@ -50,34 +50,46 @@ class contour_tracker:
         
 
 
-    # np.vectorize(func) will return a function that can be applied to a numpy array
-    def get_avg_radius(self, frame, center, contours):
-        # list is in shape [[[x,y]],[[x,y]],[[x,y]]]
-        contours_array = np.squeeze(contours)
-        distances = np.sqrt(np.sum((contours_array - center) ** 2, axis=1))
-        avg_radius = np.mean(distances)
-        avg_offset = np.mean(contours_array - center, axis=0)
-        return avg_radius, avg_offset.tolist()
-
-        
-        
 
     # get_avg_radius numpy verctorizer version
 
-    def get_center(self, frame, contours, n):
+    def get_bounds(self, frame, contours, n):
+        def get_extremes(contour, center):
+            contour = np.squeeze(contour)
+            max_x = np.max(contour[:,0])
+            max_y = np.max(contour[:,1])
+            max_x_dist = np.abs(max_x - center[1])
+            max_y_dist = np.abs(max_y - center[0])
+            return [max_x_dist, max_y_dist]
+        
+        def get_avg_radius(self, center, contour):
+            # list is in shape [[[x,y]],[[x,y]],[[x,y]]]
+            contours_array = np.squeeze(contour)
+            # distances = np.sqrt(np.sum((contours_array - center) ** 2, axis=1))
+            # avg_radius = np.mean(distances)
+            avg_offset = np.mean(np.sqrt((contours_array - center)**2), axis=0)
+            return avg_offset.tolist()
+        
         def get_contour_center(contour):
+            # needs a way to handle noise 
+            # we know a contour is noise if it is a single point
+            # maybe even if it is two points
             squeezed = np.squeeze(contour)
-            if len(squeezed.shape) == 1:
-                return squeezed
-                
+            if len(squeezed) <= 100:
+                return [np.nan, np.nan]
+            
             center = np.mean(squeezed, axis=0)
             return center
+        
 
         split_contours = (contours[:n])
         centers = []
+        radiuses = []
         if len(split_contours) <= 1:
             center = get_contour_center(split_contours[0])
             centers = [center]
+            rad = get_avg_radius(self, center, split_contours[0])
+            radiuses = [rad]
         else:
             # i have no idea why but np.vectorize(get_contour_center) doesn't work
             # it begins to iterateover the indivdual coordinates of the points rather than 
@@ -85,16 +97,22 @@ class contour_tracker:
             for contour in split_contours:
                 center = get_contour_center(contour)
                 centers.append(center)
-        avg_center = np.mean(centers, axis=0)
-        int_center = avg_center.astype(int)
-        return int_center    
+        # check if there are any nan values
+        # if there are, then we need to use the previous center
+        if np.isnan(centers).any():
+            avg_center = self.centroids      
+            avg_radius = self.avg_radius
+
+        else:
+            avg_center = np.mean(centers, axis=0)
+            avg_center = avg_center.astype(int)
+            for contour in split_contours:
+                # rad = get_avg_radius(self, avg_center, contour)
+                rad = get_extremes(contour, avg_center)
+                radiuses.append(rad)
+            avg_radius = np.mean(radiuses, axis=0)
+
+            avg_radius = avg_radius.astype(int)
+            # print("avg_center: ", avg_center)
+        return avg_center, avg_radius
     
-
-        # avg_x = np.sum(contours, axis=0) // len(contours)
-        # avg_y = np.sum(contours, axis=1) // len(contours)
-        # return [avg_x, avg_y]
-        pass
-    def draw_bounding_box():
-        pass
-
-
