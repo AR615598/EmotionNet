@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 
+
 class comp_tracker:
     def __init__(self) -> None:
         self.prev_frame = None 
