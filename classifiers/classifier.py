@@ -38,7 +38,6 @@ class classifier:
         DeepF = DeepFace.analyze(img_path = img, enforce_detection=False, actions = ['emotion', 'dominant_emotion'])
         print(dominant_emotion, emotion_score)
         print(DeepF[0]['dominant_emotion'])
-        print(DeepF[0]['emotion'])
         final_pred = None
         # top emotion will return None if no face is detected
         if dominant_emotion == None:

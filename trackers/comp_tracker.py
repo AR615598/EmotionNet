@@ -6,8 +6,8 @@ import math
 class comp_tracker:
     def __init__(self) -> None:
         self.prev_frame = None 
-        self.prev_radius = [0,0]
-        self.prev_centroid = [0,0]
+        self.prev_radius = np.array([0,0])
+        self.prev_centroid = np.array([0,0])
 
 
 
@@ -44,7 +44,7 @@ class comp_tracker:
             avg_y_offset = self.prev_radius[1]
         self.prev_radius = [avg_x_offset, avg_y_offset]
 
-        return [avg_x_offset, avg_y_offset]
+        return [avg_x_offset, avg_x_offset]
 
     # get_avg_radius numpy verctorizer version
 

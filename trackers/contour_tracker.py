@@ -6,8 +6,8 @@ class contour_tracker:
         self.prev_frame = None
         self.width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)    
-        self.centroids = [self.width / 2, self.height / 2]
-        self.avg_radius = 1
+        self.centroids = np.array([self.width / 2, self.height / 2])
+        self.avg_radius = np.array([1,1])
           
           
     
@@ -56,10 +56,8 @@ class contour_tracker:
         def get_extremes(contour, center):
             contour = np.squeeze(contour)
             max_x = np.max(contour[:,0])
-            max_y = np.max(contour[:,1])
             max_x_dist = np.abs(max_x - center[1])
-            max_y_dist = np.abs(max_y - center[0])
-            return [max_x_dist, max_y_dist]
+            return [max_x_dist, max_x_dist]
         
         def get_avg_radius(self, center, contour):
             # list is in shape [[[x,y]],[[x,y]],[[x,y]]]
