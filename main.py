@@ -91,15 +91,14 @@ class EmotionNet:
         path = "classifiers/frame.jpg"
         cv2.imwrite(path, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
         # check if the file was written
-        if os.path.exists(path):
-            print("Image saved successfully.")
-        else:
-            print("Image could not be saved.")
+        if not os.path.exists(path):
             exit(1)
 
         return path
     def classify_emotion(self, frame):
-        pass
+        # classify the emotion
+        emotion = self.classifier(frame)
+        return emotion
     def find_mask(self, frame):
         centroids, avg_radius = self.track.mask_shape(frame)
         # we need to average the center and radius over a few frames
@@ -131,13 +130,17 @@ class EmotionNet:
         bottom_right = (self.centroids[0] + self.avg_radius[0], self.centroids[1] -self.avg_radius[1])
         # rectangle bounding the subject
         cv2.rectangle(frame, top_left, bottom_right,  (0, 0, 255), 2)
+    def draw_emotion(self, frame, emotion, topL):
+        # draw the emotion above the bounding box
+        cv2.putText(frame, emotion, topL, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
     def main(self):
         # Display the frame in a window named "Camera"
         frame_count = 0
         camera_flag = True
-        mask_flag = False
-        classification_flag = False
-        emotion_flag =  False
+        mask_flag = True
+        classification_flag = True
+        emotion_flag =  True
+        emotion = None
 
 
 
@@ -145,26 +148,8 @@ class EmotionNet:
             # Check if the frame was successfully read
             if not ret:
                 print("Failed to capture frame.")
-                break
-            
-            # switching trackers
-            # 1 = comp, 2 = cont, 3 = NN, 4 = boring
-            if cv2.waitKey(1) & 0xFF == ord('1'):
-                self.change_tracker('comp')
-            if cv2.waitKey(1) & 0xFF == ord('2'):
-                self.change_tracker('cont')
-            if cv2.waitKey(1) & 0xFF == ord('3'):
-                self.change_tracker('NN')
-            if cv2.waitKey(1) & 0xFF == ord('4'):
-                self.change_tracker('boring')    
+                break 
                 
-
-
-
-            # if m is pressed, we can change the mask flag
-            if cv2.waitKey(1) & 0xFF == ord('m'):
-                mask_flag = not mask_flag
-
             # if mask flag is true, we display the mask
             # but we need to find the mask first
             if mask_flag:
@@ -181,16 +166,15 @@ class EmotionNet:
   
                 if self.current_mask[0] is not None and self.current_mask[1] is not None:    
                     self.draw_bounds(frame, self.current_mask[0], self.current_mask[1])
-
+                    if emotion_flag:
+                        topL =  (self.centroids[0] - self.avg_radius[0], self.centroids[1] - self.avg_radius[1] - 15)
+                        self.draw_emotion(frame, emotion, topL)
 
                 
                     # if we have the average center and radius, we can draw the bounding box
                     # and with that we can crop the frame and classify the emotion
                     # we will do this every 10 frames
                     if frame_count % 10 == 0:
-                        # if e is pressed, we can change the emotion flag
-                        if cv2.waitKey(1) & 0xFF == ord('e'):
-                            emotion_flag = not emotion_flag
                         # if emotion flag is true, we display the emotion
                         # but we need to classify the emotion first
 
@@ -198,20 +182,38 @@ class EmotionNet:
                             self.crop_frame(frame, centroids, avg_radius)
                             path = self.crop_frame(frame, centroids, avg_radius)
                             path = self.frame_to_png(path)
-                            self.classifier(path)
-                        # if c is pressed, we can change the camera flag
-            if cv2.waitKey(1) & 0xFF == ord('c'):
-                camera_flag = not camera_flag
+                            emotion = self.classify_emotion(path)
+                    
+      
 
             # if it is true, we display the camera
             if camera_flag:
                 cv2.imshow(self.tracker_type, frame)
 
+            # switching trackers
+            # 1 = comp, 2 = cont, 3 = NN, 4 = boring
+            key = cv2.waitKey(10) & 0xFF
 
-            # Break the loop if 'q' is pressed
-            if cv2.waitKey(1) & 0xFF in (ord("q"), 27):
+            # switching trackers
+            if key == ord('1'):
+                self.change_tracker('comp')
+            if key == ord('2'):
+                self.change_tracker('cont')
+            if key == ord('3'):
+                self.change_tracker('NN')
+            if key == ord('4'):
+                self.change_tracker('boring')   
+            # other flags
+            if key in (ord("q"), 27):
                 break
+            if key == ord('m'):
+                mask_flag = not mask_flag
+            if key == ord('c'):
+                camera_flag = not camera_flag
+            if key == ord('e'):
+                emotion_flag = not emotion_flag         
             frame_count += 1
+        cv2.destroyAllWindows()    
         self.cap.release()
 
 

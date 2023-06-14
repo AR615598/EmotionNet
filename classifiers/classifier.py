@@ -33,21 +33,16 @@ class classifier:
 
     def pred(self, img):
         dominant_emotion, emotion_score = self.classifier.top_emotion(img)
-        DeepF = DeepFace.analyze(img_path = img, enforce_detection=False, actions = ['emotion', 'dominant_emotion'])
-        print("FER")
-        print(dominant_emotion, emotion_score)
-        print("DeepFace")
-        print(DeepF[0]['dominant_emotion'])
+        # fer will return None if no face is detected
+        # deepface will always return an emotion
+        # but fer is more accurate
         final_pred = None
         # top emotion will return None if no face is detected
-        if dominant_emotion == None:
-            # use deepface
-            final_pred = DeepF[0]['dominant_emotion']
+        if dominant_emotion != None:
+            final_pred = dominant_emotion
         else:
-            if emotion_score > DeepF[0]['emotion'][dominant_emotion]:
-                final_pred = dominant_emotion
-            else:
-                final_pred = DeepF[0]['dominant_emotion']
+            DeepF = DeepFace.analyze(img_path = img, enforce_detection=False, actions = ['emotion', 'dominant_emotion'])
+            final_pred = DeepF[0]['dominant_emotion']
         return final_pred
 
 if __name__ == "__main__":
