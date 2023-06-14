@@ -15,7 +15,7 @@ class classifier:
     def __init__(self, frame = None) -> None:
         self.classifier = FER(mtcnn=True)
         self.default_image = '/Users/alexramirez/Personal_Projects/EmotionNet/data/photos/archive/test/happy/PrivateTest_258543.jpg'
-        self.default_image_class = 'disgust' 
+        self.default_image_class = 'happy' 
         # init the model'\
         if frame == None: 
             # assume training 
@@ -28,15 +28,15 @@ class classifier:
 
         else:
             img = cv2.imread(img)
-        cv2.imshow('img', img)
-        cv2.waitKey(0)
         return self.pred(img)
 
 
     def pred(self, img):
         dominant_emotion, emotion_score = self.classifier.top_emotion(img)
         DeepF = DeepFace.analyze(img_path = img, enforce_detection=False, actions = ['emotion', 'dominant_emotion'])
+        print("FER")
         print(dominant_emotion, emotion_score)
+        print("DeepFace")
         print(DeepF[0]['dominant_emotion'])
         final_pred = None
         # top emotion will return None if no face is detected
@@ -49,13 +49,6 @@ class classifier:
             else:
                 final_pred = DeepF[0]['dominant_emotion']
         return final_pred
-
-    def load(self):
-        pass 
-    def save(self, filename):
-        pass
-    def train(self,data):
-        pass 
 
 if __name__ == "__main__":
     # test the classifier

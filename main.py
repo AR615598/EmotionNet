@@ -11,6 +11,7 @@ from classifiers import classifier as classifier
 import main
 import argparse
 import threading
+import os
 
 
 
@@ -25,6 +26,7 @@ class EmotionNet:
         # Open the default camera (usually the built-in webcam)
         self.cap = cv2.VideoCapture(0)
         self.tracker_type = tracker_type
+        self.classifier = classifier.classifier()
         self.track = self.init_tracker()
         self.width = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.height = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -91,6 +93,17 @@ class EmotionNet:
                 self.current_mask = [centroids, avg_radius]
             if self.current_mask[0] is not None and self.current_mask[1] is not None:    
                 self.draw_bounds(frame, self.current_mask[0], self.current_mask[1])
+            # if we have the average center and radius, we can draw the bounding box
+            # and with that we can crop the frame and classify the emotion
+            # we will do this every 10 frames
+            if frame_count % 10 == 0 and frame_count != 0 and len(box_data) == 10:
+                path = self.crop_frame(frame, centroids, avg_radius)
+                path = self.frame_to_png(path)
+                self.classifier(path)
+                
+                # now we can classify the emotion
+
+
 
 
             frame_count += 1
@@ -151,11 +164,22 @@ class EmotionNet:
         cropped_frame = frame[bottom_right[1]:top_left[1], top_left[0]:bottom_right[0]]
         # but we need to resize it to 48x48
         cropped_frame = cv2.resize(cropped_frame, (48, 48)) 
-        cv2.imshow("cropped", cropped_frame)
+        return cropped_frame
 
     def frame_to_png(self, frame):
+        # needs to be visaible to the classifier
+        path = "classifiers/frame.jpg"
+        cv2.imwrite(path, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+        # check if the file was written
+        if os.path.exists(path):
+            print("Image saved successfully.")
+        else:
+            print("Image could not be saved.")
+            exit(1)
+
+        return path
+
         
-        pass
     def classify_emotion(self, frame):
         pass
 
