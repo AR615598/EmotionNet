@@ -12,6 +12,7 @@ import main
 import argparse
 import threading
 import os
+from pynput import keyboard
 
 
 # Create a VideoCapture object and creates a mask for the subject
@@ -141,6 +142,33 @@ class EmotionNet:
         classification_flag = True
         emotion_flag =  True
         emotion = None
+        
+        # captures keypresses
+        def on_press(key):
+            nonlocal camera_flag, mask_flag, emotion_flag, classification_flag
+            # Switching trackers
+            if key == keyboard.KeyCode.from_char('1'):
+                self.change_tracker('comp')
+            if key == keyboard.KeyCode.from_char('2'):
+                self.change_tracker('cont')
+            if key == keyboard.KeyCode.from_char('3'):
+                self.change_tracker('NN')
+            if key == keyboard.KeyCode.from_char('4'):
+                self.change_tracker('boring')
+            
+            # Other flags
+            if key in (keyboard.KeyCode.from_char('q'), keyboard.Key.esc):
+                return False
+                # Exit the loop
+            if key == keyboard.KeyCode.from_char('m'):
+                mask_flag = not mask_flag
+            if key == keyboard.KeyCode.from_char('c'):
+                camera_flag = not camera_flag
+            if key == keyboard.KeyCode.from_char('e'):
+                emotion_flag = not emotion_flag
+            
+        listener = keyboard.Listener(on_press=on_press)
+        listener.start()
 
 
 
@@ -189,33 +217,17 @@ class EmotionNet:
             # if it is true, we display the camera
             if camera_flag:
                 cv2.imshow(self.tracker_type, frame)
-
-            # switching trackers
-            # 1 = comp, 2 = cont, 3 = NN, 4 = boring
-            key = cv2.waitKey(10) & 0xFF
-
-            # switching trackers
-            if key == ord('1'):
-                self.change_tracker('comp')
-            if key == ord('2'):
-                self.change_tracker('cont')
-            if key == ord('3'):
-                self.change_tracker('NN')
-            if key == ord('4'):
-                self.change_tracker('boring')   
-            # other flags
-            if key in (ord("q"), 27):
-                break
-            if key == ord('m'):
-                mask_flag = not mask_flag
-            if key == ord('c'):
-                camera_flag = not camera_flag
-            if key == ord('e'):
-                emotion_flag = not emotion_flag         
             frame_count += 1
+            # Press Q on keyboard to exit the program
+            cv2.waitKey(1)
+            # if the listener detects a keypress, we exit the program
+            if not listener.running:
+                break
+
         cv2.destroyAllWindows()    
         self.cap.release()
 
+   
 
 def main():
     # the default tracker is the comparison tracker
