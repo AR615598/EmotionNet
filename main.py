@@ -218,7 +218,7 @@ class EmotionNet:
             if camera_flag:
                 cv2.imshow(self.tracker_type, frame)
             frame_count += 1
-            # Press Q on keyboard to exit the program
+            # needs to wait unless the frame will not be displayed
             cv2.waitKey(1)
             # if the listener detects a keypress, we exit the program
             if not listener.running:
