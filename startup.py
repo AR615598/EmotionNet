@@ -24,8 +24,6 @@ def cam_permission():
     cap.release()
     return True
 
-   
-
 
 
 
@@ -46,26 +44,38 @@ questions = [
                 choices=['Frame Comparison Tracker', 'Contour Tracker', 'Neural Network (WIP)', 'CV2 Built in tracker'],
             ),
     # then we will ask for the display preferences
-    inquirer.List('size',
+    inquirer.List('display',
                 message="Display camera feed?",
                 choices=['Yes', 'No']
             ),
     # then we will ask for the mask preferences
-    inquirer.List('size',
+    inquirer.List('mask',
                 message="Display mask?",
                 choices=['Yes', 'No']
             ),
     # then we will ask for the emotion preferences
-    inquirer.List('size',
+    inquirer.List('classifier',
                 message="Use emotion classifier?",
                 choices=['Yes', 'No']
             ),
     # then we will ask for the resolution preferences
     inquirer.Text('resolution', message="What resolution would you like to use?"),
 ]
-inquirer.prompt(questions)
+ans = inquirer.prompt(questions)
+trackers = {'Frame Comparison Tracker' : 'comp'
+            , 'Contour Tracker' : 'cont'
+            , 'Neural Network (WIP)' : 'NN'
+            , 'CV2 Built in tracker' : 'boring'}
 
-# then we will ask for the mask preferences
-# then we will ask for the emotion preferences
-# then we will ask for the resolution preferences
-# then we will run the classifier 
+bools = {'Yes' : True, 'No' : False}
+tracker = trackers[ans['size']]
+camera_flag = bools[ans['display']]
+mask_flag = bools[ans['mask']]
+emotion_flag = bools[ans['classifier']]
+resolution = int(ans['resolution'])
+# run the main program
+
+emotionNet = main.EmotionNet(tracker)
+emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution)
+
+
