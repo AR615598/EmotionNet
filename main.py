@@ -203,6 +203,7 @@ class EmotionNet:
         # Display the frame in a window named "Camera"
         frame_count = 0
         emotion = None
+        conf = None
 
         for ret, frame in self.frame_generator():
             # Check if the frame was successfully read
@@ -234,16 +235,16 @@ class EmotionNet:
                     path = self.crop_frame(frame, centroids, avg_radius, resolution)
                     path = self.frame_to_png(path)
                     if emotion_flag:
-                        emotion = self.classify_emotion(path)
+                        emotion, conf = self.classify_emotion(path)
                 if mask_flag:   
                     self.draw_bounds(frame, self.current_mask[0], self.current_mask[1])
-                    if emotion_flag and emotion is not None:
+                    if emotion_flag and emotion is not None and conf is not None:
                         topL =  (self.centroids[0] - self.avg_radius[0], self.centroids[1] - self.avg_radius[1] + 20)
                         self.draw_emotion(frame, emotion, topL)
-                        logging.info("Emotion: {}".format(emotion))
-                elif emotion_flag and emotion is not None:
+                        # add padding 
+                        print(f"Emotion: {emotion:{6}} | Confidence: {conf}", end="\r")
+                elif emotion_flag and emotion is not None and conf is not None:
                     self.draw_emotion(frame, emotion, (0,20))
-                    logging.info("Emotion: {}".format(emotion))                 
 
             
                     

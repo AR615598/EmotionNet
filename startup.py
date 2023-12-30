@@ -40,8 +40,8 @@ else:
 # Which tracker to use
 questions = [
     inquirer.List('size',
-                message="What size do you need?",
-                choices=['Frame Comparison Tracker', 'Contour Tracker', 'Neural Network (WIP)', 'CV2 Built in tracker'],
+                message="What tracker do you need?",
+                choices=['Frame Comparison Tracker', 'Contour Tracker', 'Neural Network (WIP)', 'CV2 Built in tracker (BEST)'],
             ),
     # then we will ask for the display preferences
     inquirer.List('display',
@@ -50,7 +50,7 @@ questions = [
             ),
     # then we will ask for the mask preferences
     inquirer.List('mask',
-                message="Display mask?",
+                message="Display mask on feed?",
                 choices=['Yes', 'No']
             ),
     # then we will ask for the emotion preferences
@@ -59,13 +59,13 @@ questions = [
                 choices=['Yes', 'No']
             ),
     # then we will ask for the resolution preferences
-    inquirer.Text('resolution', message="What resolution would you like to use?"),
+    inquirer.Text('resolution', message="What resolution should the classifier use? (higher is more accurate, but slower)"),
 ]
 ans = inquirer.prompt(questions)
 trackers = {'Frame Comparison Tracker' : 'comp'
             , 'Contour Tracker' : 'cont'
             , 'Neural Network (WIP)' : 'NN'
-            , 'CV2 Built in tracker' : 'boring'}
+            , 'CV2 Built in tracker (BEST)' : 'boring'}
 
 bools = {'Yes' : True, 'No' : False}
 tracker = trackers[ans['size']]
