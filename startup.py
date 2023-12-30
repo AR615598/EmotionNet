@@ -1,0 +1,1 @@
+#  Gets the computer permissions and asks for the tracker presets 

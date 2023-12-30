@@ -3,7 +3,6 @@ from fer import FER
 from deepface import DeepFace
 import cv2
 
-class classifier:
     # this class will classify the provided frame/image 
     # training will use a premade dataset of mixed emotions 
     # in actual use the frames from the tracker class. 
@@ -12,15 +11,15 @@ class classifier:
     # contains a face/portrait. So all this class will do is classify 
 
     # sets up the model
-    def __init__(self, frame = None) -> None:
+class classifier:
+    def __init__(self, frame=None) -> None:
         self.classifier = FER(mtcnn=True)
         self.default_image = '/Users/alexramirez/Personal_Projects/EmotionNet/data/photos/archive/test/happy/PrivateTest_258543.jpg'
         self.default_image_class = 'happy' 
-        # init the model'\
-        if frame == None: 
-            # assume training 
+        if frame is None: 
             pass
-        pass
+
+
     def __call__(self, img = None) -> Any:
         if img == None:
             img = self.default_image
@@ -49,4 +48,6 @@ if __name__ == "__main__":
     # test the classifier
     classifier_instance = classifier()
     classifier_instance()
-    pass
+
+
+    
