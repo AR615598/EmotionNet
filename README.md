@@ -45,8 +45,16 @@ emotionNet = main.EmotionNet(tracker)
 for x,y in emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution):
     emotions.append(x)
 ```
+In this example, we utilized the cont tracker, and here are all available trackers:
 
-emotionnet.run() is a generator designed for aggregating observed emotions effortlessly. Grant the necessary permissions, specify your desired parameters, and initiate the process to begin aggregating emotion classifications seamlessly.
+- cont: This tracker compares contours in a set of recent frames, averaging them to identify the frame's subject. It is effective on a static background.
+- comp: Similar to the contour tracker, this tracker averages absolute differences between current and previous frames to identify the subject. It is applicable under the same constraints as the cont tracker.
+- NN: This tracker is a work in progress.
+- boring: This tracker uses the native OpenCV facial detection model.
+
+The `camera_flag` determines whether to display the live webcam feed. It can be complemented with the `mask_flag`, which, when set to true, will draw bounding boxes around the images received by the classifiers. The next parameter, `emotion_flag`, toggles the classifier on or off. Finally, the `resolution` value sets the dimensions of the input image. Lower resolutions are computationally less expensive and faster, but less accurate, with a minimum resolution limit of 20.
+
+emotionNet.run() is a generator designed for aggregating observed emotions effortlessly. Grant the necessary permissions, specify your desired parameters, and initiate the process to begin aggregating emotion classifications seamlessly.
 
 ## Disclaimer 
 This project operates entirely offline, ensuring no internet connection is required. All temporary files are automatically cleaned up upon the program's termination. In the event of an interruption, the temporary file can be accessed at 'classifiers/frame.jpg' and manually deleted if necessary.
