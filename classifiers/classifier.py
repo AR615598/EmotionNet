@@ -40,10 +40,12 @@ class classifier:
         # top emotion will return None if no face is detected
         if dominant_emotion != None:
             final_pred = dominant_emotion
+            confidence = emotion_score * 100
         else:
             DeepF = DeepFace.analyze(img_path = img, enforce_detection=False, actions = ['emotion', 'dominant_emotion'], silent=True)
             final_pred = DeepF[0]['dominant_emotion']
             confidence = DeepF[0]['emotion'][final_pred]
+            confidence = confidence 
         return final_pred, confidence
 
 if __name__ == "__main__":

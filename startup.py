@@ -59,7 +59,7 @@ questions = [
                 choices=['Yes', 'No']
             ),
     # then we will ask for the resolution preferences
-    inquirer.Text('resolution', message="What resolution should the classifier use? (higher is more accurate, but slower)"),
+    inquirer.Text('resolution', message="What resolution should the classifier use? (No less than 20)"),
 ]
 ans = inquirer.prompt(questions)
 trackers = {'Frame Comparison Tracker' : 'comp'
@@ -76,6 +76,8 @@ resolution = int(ans['resolution'])
 # run the main program
 
 emotionNet = main.EmotionNet(tracker)
-emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution)
+# generator dummy
+for x in emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution):
+    pass
 
 

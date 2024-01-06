@@ -242,17 +242,16 @@ class EmotionNet:
                         topL =  (self.centroids[0] - self.avg_radius[0], self.centroids[1] - self.avg_radius[1] + 20)
                         self.draw_emotion(frame, emotion, topL)
                         # add padding 
-                        print(f"Emotion: {emotion:{6}} | Confidence: {conf}", end="\r")
+                        print(f"Emotion: {emotion:{6}} | Confidence: {conf}", end="\r", flush=True)
                 elif emotion_flag and emotion is not None and conf is not None:
                     self.draw_emotion(frame, emotion, (0,20))
-
-            
-                    
-      
 
             # if it is true, we display the camera
             if camera_flag:
                 cv2.imshow(self.tracker_type, frame)
+
+            if emotion is not None and conf is not None:
+                yield emotion, conf
             frame_count += 1
             # needs to wait unless the frame will not be displayed
             cv2.waitKey(1)
@@ -260,8 +259,12 @@ class EmotionNet:
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+
+
         cv2.destroyAllWindows()    
         self.cap.release()
+        # delete the photos
+        os.remove("classifiers/frame.jpg")
 
    
 
@@ -287,6 +290,9 @@ if __name__ == "__main__":
 
     emotionNet = EmotionNet(tracker_type)
     emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution)
+    # generator dummy
+    for x in emotionNet.run(emotion_flag, mask_flag, camera_flag, resolution):
+        pass
 
     
 # to run use 
