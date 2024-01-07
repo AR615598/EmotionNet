@@ -27,8 +27,7 @@ To run the example you will need to run the setup file as such
 ```
 python3 startup.py
 ```
-This program will request webcam access upon the initial run, allowing you to grant the necessary permissions. Subsequently, it will guide you through various configuration questions to customize the output. To exit when the display is active, simply hold down the 'q' key while the window is in focus. Alternatively, if no display is visible, exit using the standard process for interrupting a program.
-
+Upon its first execution, this program will prompt you to authorize webcam access, ensuring the necessary permissions are granted. Following this, it will walk you through a series of configuration questions, allowing you to tailor the output to your preferences. If you wish to terminate the program while it's running, you can either disable the webcam feed or simply press the exit button. This action will conclude the execution of the run() function within the main program.
 ## Usage
 This exmaple illustrates how we can use the project: 
 ``` python
@@ -54,7 +53,10 @@ In this example, we utilized the cont tracker, and here are all available tracke
 
 The `camera_flag` determines whether to display the live webcam feed. It can be complemented with the `mask_flag`, which, when set to true, will draw bounding boxes around the images received by the classifiers. The next parameter, `emotion_flag`, toggles the classifier on or off. Finally, the `resolution` value sets the dimensions of the input image. Lower resolutions are computationally less expensive and faster, but less accurate, with a minimum resolution limit of 20.
 
-emotionNet.run() is a generator designed for aggregating observed emotions effortlessly. Grant the necessary permissions, specify your desired parameters, and initiate the process to begin aggregating emotion classifications seamlessly.
+`emotionNet.run()` is a generator designed for aggregating observed emotions effortlessly. Grant the necessary permissions, specify your desired parameters, and initiate the process to begin aggregating emotion classifications seamlessly. 
+
+To conclude the process, the same principles apply when quitting from the setup.py. You can either terminate the webcam feed or press the 'Esc' key. This will effectively exit the program and complete the execution of the setup process.
+
 
 ## Disclaimer 
 This project operates entirely offline, ensuring no internet connection is required. All temporary files are automatically cleaned up upon the program's termination. In the event of an interruption, the temporary file can be accessed at 'classifiers/frame.jpg' and manually deleted if necessary.
