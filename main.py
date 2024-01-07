@@ -11,6 +11,7 @@ from classifiers import classifier as classifier
 import logging
 import os
 import argparse
+from quitter import Quitter
 
 
 
@@ -204,59 +205,61 @@ class EmotionNet:
         frame_count = 0
         emotion = None
         conf = None
+        
+        quitter = Quitter()
+        while quitter.listener.running:
+            try:
+                ret, frame = next(self.frame_generator())
+                # Check if the frame was successfully read
+                if not ret:
+                    print("Failed to capture frame.")
+                    break 
+                    
+                # if mask flag is true, we display the mask
+                # but we need to find the mask first
+                self.find_mask(frame)
 
-        for ret, frame in self.frame_generator():
-            # Check if the frame was successfully read
-            if not ret:
-                print("Failed to capture frame.")
-                break 
-                
-            # if mask flag is true, we display the mask
-            # but we need to find the mask first
-            self.find_mask(frame)
+                # every 4 frames, we draw the bounding box 
+                if  frame_count != 0 and len(self.box_data) == 10:
+                    # we need to average the center and radius over a few frames
+                    # to get a more accurate representation of the subject
+                    # box_data = [[center, radius],[center, radius],[center, radius],[center, radius]]
+                    centroids, avg_radius = self.average_mask(frame)
+                    self.current_mask = [centroids, avg_radius]
 
-            # every 4 frames, we draw the bounding box 
-            if  frame_count != 0 and len(self.box_data) == 10:
-                # we need to average the center and radius over a few frames
-                # to get a more accurate representation of the subject
-                # box_data = [[center, radius],[center, radius],[center, radius],[center, radius]]
-                centroids, avg_radius = self.average_mask(frame)
-                self.current_mask = [centroids, avg_radius]
+    
+                if self.current_mask[0] is not None and self.current_mask[1] is not None: 
+                    # if we have the average center and radius, we can draw the bounding box
+                    # and with that we can crop the frame and classify the emotion
+                    # we will do this every 10 frames
+                    if frame_count % 10 == 0:
+                        # if emotion flag is true, we display the emotion
+                        # but we need to classify the emotion first
+                        self.crop_frame(frame, centroids, avg_radius)
+                        path = self.crop_frame(frame, centroids, avg_radius, resolution)
+                        path = self.frame_to_png(path)
+                        if emotion_flag:
+                            emotion, conf = self.classify_emotion(path)
+                    if mask_flag:   
+                        self.draw_bounds(frame, self.current_mask[0], self.current_mask[1])
+                        if emotion_flag and emotion is not None and conf is not None:
+                            topL =  (self.centroids[0] - self.avg_radius[0], self.centroids[1] - self.avg_radius[1] + 20)
+                            self.draw_emotion(frame, emotion, topL)
+                            # add padding 
+                            print(f"Emotion: {emotion:{6}} | Confidence: {conf}", end="\r", flush=True)
+                    elif emotion_flag and emotion is not None and conf is not None:
+                        self.draw_emotion(frame, emotion, (0,20))
 
-  
-            if self.current_mask[0] is not None and self.current_mask[1] is not None: 
-                # if we have the average center and radius, we can draw the bounding box
-                # and with that we can crop the frame and classify the emotion
-                # we will do this every 10 frames
-                if frame_count % 10 == 0:
-                    # if emotion flag is true, we display the emotion
-                    # but we need to classify the emotion first
-                    self.crop_frame(frame, centroids, avg_radius)
-                    path = self.crop_frame(frame, centroids, avg_radius, resolution)
-                    path = self.frame_to_png(path)
-                    if emotion_flag:
-                        emotion, conf = self.classify_emotion(path)
-                if mask_flag:   
-                    self.draw_bounds(frame, self.current_mask[0], self.current_mask[1])
-                    if emotion_flag and emotion is not None and conf is not None:
-                        topL =  (self.centroids[0] - self.avg_radius[0], self.centroids[1] - self.avg_radius[1] + 20)
-                        self.draw_emotion(frame, emotion, topL)
-                        # add padding 
-                        print(f"Emotion: {emotion:{6}} | Confidence: {conf}", end="\r", flush=True)
-                elif emotion_flag and emotion is not None and conf is not None:
-                    self.draw_emotion(frame, emotion, (0,20))
+                # if it is true, we display the camera
+                if camera_flag:
+                    cv2.imshow(self.tracker_type, frame)
+                    cv2.waitKey(1)
 
-            # if it is true, we display the camera
-            if camera_flag:
-                cv2.imshow(self.tracker_type, frame)
-
-            if emotion is not None and conf is not None:
-                yield emotion, conf
-            frame_count += 1
-            # needs to wait unless the frame will not be displayed
-            cv2.waitKey(1)
-            # if the listener detects a keypress, we exit the program
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+                if emotion is not None and conf is not None:
+                    yield emotion, conf
+                frame_count += 1
+                # needs to wait unless the frame will not be displayed
+            except KeyboardInterrupt:
                 break
 
 
