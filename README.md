@@ -12,6 +12,7 @@ This project leverages the user's webcam as a primary input, utilizing the [open
 - Sys 
 - Logging 
 - Typing
+- Pynput
 - FER
 - DeepFace
 - OS
