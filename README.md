@@ -31,7 +31,7 @@ This program will request webcam access upon the initial run, allowing you to gr
 
 ## Usage
 This exmaple illustrates how we can use the project: 
-```
+``` python
 import main.py 
 
 tracker = 'cont'
