@@ -5,7 +5,7 @@ An emotion classification project designed for real-time analysis using webcam i
 This project leverages the user's webcam as a primary input, utilizing the [openCV](https://opencv.org/) library to process data on a frame-by-frame basis. Each frame undergoes tracking, where filters, masks, or neural networks are employed to estimate the center of the subject's face. Utilizing this information, a bounding box is approximated around the user, optimizing input size for the classifier while maintaining data integrity. Following the capture and storage of the specified photo subsection, the classification process is initiated. To acheive this, the [DeepFace](https://github.com/serengil/deepface) and [FER](https://github.com/JustinShenk/fer) classifier is employed for classifications. The user-configurable parameters dictate whether the emotion output is displayed on both the terminal and a real-time display or solely on the terminal.
 
 ## Setup
-1. Install requirements, Use `pip3 install .` or 'pip3 install -r requirements.txt'
+Install requirements, Use `pip3 install .` or `pip3 install -r requirements.txt`
 
 ## Demonstration 
 To run you can run the example file as such. 
