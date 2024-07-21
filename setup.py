@@ -1,0 +1,17 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='emotionnet',
+    version='0.1',
+    packages=find_packages(),
+    install_requires=[
+        "deepface==0.0.79", 
+        "fer==22.5.1", 
+        "inquirer==3.3.0", 
+        "numpy==1.24.3", 
+        "opencv_contrib_python==4.8.0.76", 
+        "opencv_python==4.8.1.78", 
+        "opencv_python_headless==4.8.0.76", 
+        "pynput==1.7.6"
+    ],
+)
