@@ -3,11 +3,11 @@ import numpy as np
 import math
 import sys
 import logging
-from trackers import boring_tracker as boring
-from trackers import NN_tracker as nn
-from trackers import contour_tracker as cont
-from trackers import comp_tracker as comp
-from classifiers import classifier as classifier
+from emotionnet.trackers import boring_tracker as boring
+from emotionnet.trackers import NN_tracker as nn
+from emotionnet.trackers import contour_tracker as cont
+from emotionnet.trackers import comp_tracker as comp
+from emotionnet.classifiers import classifier as classifier
 import os
 import argparse
 from pynput.keyboard import Key, Listener
