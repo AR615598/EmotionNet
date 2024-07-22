@@ -6,6 +6,7 @@ This project leverages the user's webcam as a primary input, utilizing the [open
 
 ## Setup
 From the root of the project directory, install the requirements, 
+
 Use `pip3 install .` or `pip3 install -r requirements.txt`
 
 ## Demonstration 
