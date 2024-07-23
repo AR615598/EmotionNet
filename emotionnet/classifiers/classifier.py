@@ -14,7 +14,7 @@ import cv2
 class classifier:
     def __init__(self, frame=None) -> None:
         self.classifier = FER(mtcnn=True)
-        self.default_image = '/Users/alexramirez/Personal_Projects/EmotionNet/data/photos/archive/test/happy/PrivateTest_258543.jpg'
+        self.default_image = 'stop'
         self.default_image_class = 'happy' 
         if frame is None: 
             pass
