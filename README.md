@@ -22,7 +22,7 @@ If you wish to terminate the program while it's running, you can either disable 
 ## Usage
 This exmaple illustrates how we can use the project: 
 ``` python
-import main.py 
+from emotionnet import main
 
 tracker = 'cont'
 camera_flag = True
